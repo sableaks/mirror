@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  SITE_URL: https://example.com   # <-- PUT YOUR SITE HERE
+  SITE_URL: https://capital.bg   # <-- PUT YOUR SITE HERE
 
 jobs:
   mirror:
