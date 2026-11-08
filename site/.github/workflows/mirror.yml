@@ -1,0 +1,31 @@
+name: mirror
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+env:
+  SITE_URL: https://capital.bg   # <-- PUT YOUR SITE HERE
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install beautifulsoup4
+      - name: Download site
+        run: |
+          rm -rf site
+          wget --mirror --convert-links --adjust-extension --page-requisites \
+               --no-parent -nH -P site "$SITE_URL" || true
+          mkdir -p site
+      - name: Strip scripts
+        run: python3 strip.py site
+      - name: Commit if changed
+        run: |
+          git config user.name "mirror-bot"
+          git config user.email "mirror-bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || (git commit -m "sync $(date -u +%F_%T)" && git push)
